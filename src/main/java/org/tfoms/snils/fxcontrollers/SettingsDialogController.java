@@ -14,6 +14,7 @@ import java.util.Properties;
 
 
 public class SettingsDialogController {
+
     private boolean isChanged = false;
 
     @FXML

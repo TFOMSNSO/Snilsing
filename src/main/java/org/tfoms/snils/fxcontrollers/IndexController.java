@@ -85,7 +85,6 @@ public class IndexController {
         enpCol.setPrefWidth(140);
         serdocCol.setCellValueFactory(new PropertyValueFactory<>("personSerdoc"));
         numdocCol.setCellValueFactory(new PropertyValueFactory<>("personNumdoc"));
-        System.out.println("init column good");
 
         personTableview.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         ContextMenu contextMenu = getContextMenu();
@@ -118,7 +117,7 @@ public class IndexController {
 
 
     @FXML
-    public void openSettings(){
+    protected void openSettings(){
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/settings.fxml"));
         try {
             Parent parent = loader.load();
@@ -130,17 +129,38 @@ public class IndexController {
             stage.setTitle("Настройки");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(scene);
-
             stage.showAndWait();
         } catch (IOException e) {
             statusBar.update("Ошибка при открытии настроек",e.getMessage(),0);
         }
-
     }
 
 
     @FXML
-    public void findSnilsGood(){
+    protected void openSearchWindow(){
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/table-search.fxml"));
+
+        try {
+            Parent parent = loader.load();
+            TableSearchController controller = loader.<TableSearchController>getController();
+            controller.setPersonTable(personTableview);
+
+
+
+            Scene scene = new Scene(parent,400,400);
+            Stage stage = new Stage();
+            stage.setResizable(false);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+            stage.showAndWait();
+        } catch (IOException e) {
+            showErrorDialog(e);
+        }
+    }
+
+
+    @FXML
+    protected void findSnilsGood(){
         Thread findSnilsGoodThread = new Thread(() -> {
             try {
                 List<TablePerson> data = SnilsDAO.findSnilsGood();

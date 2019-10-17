@@ -98,6 +98,11 @@
                         <MenuItem mnemonicParsing="false" onAction="#openSettings" text="Настройки" />
                      </items>
                   </Menu>
+                  <Menu mnemonicParsing="false" text="Таблица">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#openSearchWindow" text="Поиск " />
+                    </items>
+                  </Menu>
                </menus>
             </MenuBar>
          </children>
