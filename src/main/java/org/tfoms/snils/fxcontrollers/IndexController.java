@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -17,16 +18,31 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.tfoms.snils.dao.FindSnilsDAO;
-import org.tfoms.snils.dao.SnilsDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.tfoms.snils.dao.PersonDAO;
+import org.tfoms.snils.dao.SnilsSaveDAO;
 import org.tfoms.snils.model.TablePerson;
 import org.tfoms.snils.model.ui.StatusBar;
 
 import java.io.*;
+import java.net.URL;
 import java.util.*;
 
-public class IndexController {
+
+@Controller
+public class IndexController implements Initializable {
+    private static final Logger LOG = LoggerFactory.getLogger(IndexController.class);
+
     private final ObservableList<TablePerson> personData = FXCollections.observableArrayList();
+
+    @Autowired
+    private PersonDAO personDAO;
+
+    @Autowired
+    private SnilsSaveDAO snilsSaveDAO;
 
     @FXML
     BorderPane parent;
@@ -45,7 +61,6 @@ public class IndexController {
 
     @FXML
     private TableView<TablePerson> personTableview;
-
     @FXML
     private TableColumn<TablePerson, String> snilsCol;
     @FXML
@@ -63,19 +78,22 @@ public class IndexController {
     @FXML
     private TableColumn<TablePerson,String> numdocCol;
 
+
+
     private StatusBar statusBar;
 
-    private final String statusText = "Здесь будут показываться возможные ошибки";
-    private final Tooltip statusTooltip = new Tooltip(statusText);
-
+    // поток, в котором отправка сообщений и ожидание ответов
     private IsFileExistThread checkFilesExistsThread;
 
+    // Запоминаем последний открытый файл на импорт
     private File lastImported = null;
+
+    // Запоминаем последний открытый файл на экспорт
     private File lastExported = null;
 
-
     @FXML
-    public void initialize(){
+    public void initialize(URL location, ResourceBundle resources){
+        //инициализация столбцов таблицы
         enpCol.setCellValueFactory(new PropertyValueFactory<>("enp"));
         snilsCol.setCellValueFactory(new PropertyValueFactory<>("snils"));
         famCol.setCellValueFactory(new PropertyValueFactory<>("personSurname"));
@@ -87,6 +105,7 @@ public class IndexController {
         numdocCol.setCellValueFactory(new PropertyValueFactory<>("personNumdoc"));
 
         personTableview.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
         ContextMenu contextMenu = getContextMenu();
         contextMenu.setOnShowing(event -> {
                     contextMenu.getItems().get(0).setDisable(!isRowsSelected());
@@ -101,21 +120,32 @@ public class IndexController {
         statusLabel.setContextMenu(contextMenu1);
 
         statusBar = new StatusBar(progressBar,statusLabel);
+
     }
 
+    /**
+     * Снять выделение с Tableview
+     * */
     @FXML
     public void removeSelection(Event event){
         personTableview.getSelectionModel().clearSelection();
     }
 
 
+    /**
+     * Запускает отдельный поток,
+     * в котором посылаются запросы и
+     * ожидаются ответы
+     * */
     @FXML
     public void sendQueryNew(){
         checkFilesExistsThread = new IsFileExistThread(statusBar,personTableview);
         checkFilesExistsThread.start();
     }
 
-
+    /**
+     * Открывает диалоговое окно настроек
+     * */
     @FXML
     protected void openSettings(){
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/settings.fxml"));
@@ -136,6 +166,10 @@ public class IndexController {
     }
 
 
+    /**
+     * Открывает диалоговое окно
+     * для поиска по таблице
+     * */
     @FXML
     protected void openSearchWindow(){
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/table-search.fxml"));
@@ -145,12 +179,10 @@ public class IndexController {
             TableSearchController controller = loader.<TableSearchController>getController();
             controller.setPersonTable(personTableview);
 
-
-
             Scene scene = new Scene(parent,400,400);
             Stage stage = new Stage();
             stage.setResizable(false);
-            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initModality(Modality.WINDOW_MODAL);
             stage.setScene(scene);
             stage.showAndWait();
         } catch (IOException e) {
@@ -158,12 +190,19 @@ public class IndexController {
         }
     }
 
-
+    /**
+     * Берет всех людей из таблицы со снилсами
+     * таблица - SNILS_SAVE_RESPONSE_NEW
+     * схема - DAME, пользователь - developer
+     * */
     @FXML
     protected void findSnilsGood(){
         Thread findSnilsGoodThread = new Thread(() -> {
             try {
-                List<TablePerson> data = SnilsDAO.findSnilsGood();
+//                List<TablePerson> data = SnilsDAO.findSnilsGood();
+
+//                List<TablePerson> data = personDAO.findAllGood();
+                List<TablePerson> data = snilsSaveDAO.findAllGood();
                 synchronized (personData) {
                     personData.clear();
                     personData.addAll(data);
@@ -191,6 +230,12 @@ public class IndexController {
         findSnilsGoodThread.start();
     }
 
+
+    /**
+     * Считывает енп из эксель файла,
+     * вытаскивает из базы людей по считанным енп
+     * и вставляет их в таблицу
+     * */
     @FXML
     public void importExcel(){
         statusBar.reset();//обновляем статус бар
@@ -208,7 +253,6 @@ public class IndexController {
 
         if(file == null) return;
         lastImported = file;
-
 
         statusBar.update("Считывание из экселя",-1);
         menuExport.setDisable(true);
@@ -240,7 +284,7 @@ public class IndexController {
                             Cell numCell = row.getCell(5);
                             numCell.setCellType(CellType.STRING);
                             String num  = numCell.getStringCellValue();
-                            data.add(SnilsDAO.findPerson(surname.trim().toUpperCase(),firstname.trim().toUpperCase(),lastname.trim().toUpperCase(),birthday,ser.trim(),num.trim()));
+                            data.add(personDAO.findByFIOD(surname.trim().toUpperCase(),firstname.trim().toUpperCase(),lastname.trim().toUpperCase(),birthday,ser.trim(),num.trim()));
                         } catch (Exception ex) {
                             throw new Exception("Строка " + i + "Ошибка:" + ex.toString());
                         }
@@ -254,7 +298,8 @@ public class IndexController {
                             break;
                         }
                     }
-                    data = FindSnilsDAO.findPersonByEnp1(enps);
+
+                    data = personDAO.findAllByEnp(enps);
                 }
 
 
@@ -280,15 +325,15 @@ public class IndexController {
                     showErrorDialog(ex);
                     menuExport.setDisable(false);
                 });
-
-
-
-
             }
         });
         thread.start();
     }
 
+
+    /**
+     * Записывает данные из таблицы Tableview в эксель файл
+     * */
     @FXML
     public void exportExcel(){
         statusBar.reset();
@@ -353,6 +398,10 @@ public class IndexController {
         thread.start();
     }
 
+
+    /**
+     * Удаляет выделенные строки из таблицы Tableview
+     * */
     @FXML
     public void deleteRows(Event event){
         ObservableList<TablePerson> selectedRows = personTableview.getSelectionModel().getSelectedItems();
@@ -371,43 +420,56 @@ public class IndexController {
         }
     }
 
-
+    /**
+     * Контекстное меню для таблицы
+     * */
     private ContextMenu getContextMenu(){
         ContextMenu contextMenu = new ContextMenu();
+
         MenuItem item1 = new MenuItem("Удалить выделенное");
         MenuItem item2 = new MenuItem("Очистить таблицу");
+
         item1.setOnAction(this::deleteRows);
         item2.setOnAction(this::clearTable);
+
         contextMenu.getItems().addAll(item1,item2);
 
         return contextMenu;
     }
 
+
+    /**
+     * Очистить таблицу
+     * */
     private void clearTable(Event event){
         synchronized (personTableview){
             personTableview.getItems().clear();
         }
     }
 
+
+    /**
+     * Контектсной меню для статус-бара внизу
+     * */
     private ContextMenu getContextMenuForStatusLabel(){
         ContextMenu contextMenu = new ContextMenu();
         MenuItem item1 = new MenuItem("Перестать ожидать");
-        item1.setOnAction(event -> {checkFilesExistsThread.interrupt(); statusLabel.setText("Готово");});
+
+        item1.setOnAction(event -> checkFilesExistsThread.stopThread());
+
         contextMenu.getItems().add(item1);
+
         return contextMenu;
     }
+
+
 
     private boolean isRowsSelected(){
         return personTableview.getSelectionModel().getSelectedItems().size() > 0;
     }
-
-
-    private void showErrorDialog(String errorMsg){
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setContentText(errorMsg);
-        alert.showAndWait();
-    }
-
+    /**
+     * Метод открывает диалог с ошибками
+     * */
     private void showErrorDialog(Exception errorMsg){
         Alert alert = new Alert(Alert.AlertType.ERROR);
         StringBuilder description = new StringBuilder("Описание ошибки:\n");

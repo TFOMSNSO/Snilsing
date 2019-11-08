@@ -3,17 +3,22 @@ package org.tfoms.snils.model.ui;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tooltip;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+
 
 public class StatusBar {
-    private final ProgressBar progressBar;
-    private final Label statusLabel;
+
+    private ProgressBar progressBar;
+
+    private Label statusLabel;
     private final Tooltip defaultTooltip = new Tooltip("Здесь будут показываться возможные ошибки");
 
     public StatusBar(ProgressBar pb,Label l){
         this.progressBar = pb;
         this.statusLabel = l;
     }
-
 
     public void update(String labelText){
         this.statusLabel.setText(labelText);

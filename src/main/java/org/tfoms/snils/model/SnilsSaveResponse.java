@@ -12,7 +12,7 @@ import java.util.Date;
                 "                                                            and s.personFirstname = :firstname " +
                                                                             "and s.personSurname=:surname " +
                                                                             "and s.personLastname = :lastname "),
-        @NamedQuery(name = "findSnilsGood",query = "from SnilsSaveResponse s ")
+        @NamedQuery(name = "findSnilsGood",query = "from SnilsSaveResponse s order by s.personSurname, s.personFirstname, s.personLastname ")
 })
 public class SnilsSaveResponse {
     @Id

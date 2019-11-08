@@ -13,7 +13,8 @@ import java.util.Date;
                 "where p.personSurname=:surname " +
                 "and p.personFirstname=:firstname " +
                 "and p.personLastname=:lastname " +
-                "and p.personBirthday=:birthday " )
+                "and p.personBirthday=:birthday " ),
+        @NamedQuery(name = "personAll", query = "from Person p")
 })
 public class Person {
     @Id

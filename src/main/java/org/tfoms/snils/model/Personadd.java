@@ -20,14 +20,25 @@ public class Personadd {
 
     private String dok_vi;
 
+    private Integer russian;
+
     @Override
     public String toString() {
         return "Personadd{" +
-                "personadd_addressid=" + personadd_addressid +
+                "personadd_addressid='" + personadd_addressid + '\'' +
                 ", born='" + born + '\'' +
                 ", datepassport=" + datepassport +
                 ", dok_vi='" + dok_vi + '\'' +
+                ", russian=" + russian +
                 '}';
+    }
+
+    public Integer getRussian() {
+        return russian;
+    }
+
+    public void setRussian(Integer russian) {
+        this.russian = russian;
     }
 
     public String getPersonadd_addressid() {

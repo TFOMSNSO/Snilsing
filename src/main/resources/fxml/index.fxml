@@ -70,14 +70,16 @@
                                  </font>
                                  <VBox.margin>
                                     <Insets left="10.0" />
-                                 </VBox.margin></Button>
+                                 </VBox.margin>
+                              </Button>
                               <Button fx:id="sendButton" alignment="BOTTOM_CENTER" mnemonicParsing="false" onAction="#sendQueryNew" prefHeight="25.0" prefWidth="150.0" text="Послать запрос" textOverrun="CLIP">
                                  <VBox.margin>
                                     <Insets left="10.0" top="200.0" />
                                  </VBox.margin>
                                  <font>
                                     <Font name="Bell MT Italic" size="14.0" />
-                                 </font></Button>
+                                 </font>
+                              </Button>
                            </children>
                         </VBox>
                      </children></AnchorPane>
@@ -100,7 +102,7 @@
                   </Menu>
                   <Menu mnemonicParsing="false" text="Таблица">
                     <items>
-                      <MenuItem mnemonicParsing="false" onAction="#openSearchWindow" text="Поиск " />
+                      <MenuItem disable="true" mnemonicParsing="false" onAction="#openSearchWindow" text="Поиск " />
                     </items>
                   </Menu>
                </menus>

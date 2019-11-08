@@ -10,7 +10,7 @@
             <property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@srv-oracle03:1521:dame"/>
             <property name="javax.persistence.jdbc.user" value="developer"/>
             <property name="javax.persistence.jdbc.password" value="asu"/>
-            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.show_sql" value="false"/>
         </properties>
     </persistence-unit>
 </persistence>

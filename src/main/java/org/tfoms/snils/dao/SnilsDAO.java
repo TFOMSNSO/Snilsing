@@ -1,5 +1,7 @@
 package org.tfoms.snils.dao;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tfoms.snils.model.Person;
 import org.tfoms.snils.model.Prizyvnik;
 import org.tfoms.snils.model.SnilsSaveResponse;
@@ -13,10 +15,18 @@ import java.util.List;
 
 
 public class SnilsDAO {
-//    static EntityManager em = Persistence.createEntityManagerFactory("developerUnit").createEntityManager();
+    static final Logger LOG = LoggerFactory.getLogger(SnilsDAO.class);
 
+    static int count = 0;
+
+    static EntityManager em = Persistence.createEntityManagerFactory("developerUnit").createEntityManager();
+
+    /**
+     * Возвращает все записи из таблицы SNILS_SAVE_RESPONSE_NEW (developer@dame)
+     * */
     public static List<TablePerson> findSnilsGood(){
         EntityManager em = Persistence.createEntityManagerFactory("developerUnit").createEntityManager();
+
         List<SnilsSaveResponse> snilses = em.createNamedQuery("findSnilsGood",SnilsSaveResponse.class).getResultList();
         ArrayList<TablePerson> data = new ArrayList<>();
 
@@ -27,7 +37,9 @@ public class SnilsDAO {
         return data;
     }
 
-
+    /**
+     * Поиск человека по ФИОД в таблице person (developer@dame)
+     * */
     public static TablePerson findPerson(String surname,String firstname,String lastname,Date birthday,String trueSer,String trueNum){
         EntityManager em = Persistence.createEntityManagerFactory("developerUnit").createEntityManager();
         Person person = em.createNamedQuery("personByFIOD",Person.class)
@@ -45,12 +57,15 @@ public class SnilsDAO {
     }
 
 
+
+    /**
+     * Вставка человека с полисом в SNILS_SAVE_RESPONSE_NEW (developer@dame)
+     * */
     public static void insertPerson(TablePerson person){
-        EntityManager em = Persistence.createEntityManagerFactory("developerUnit").createEntityManager();
         if(person.getSnils().trim().toLowerCase().contains("нет данных") || person.getSnils().trim().equals("-") || person.getSnils().trim().equals("ошибка")) return;
+
         SnilsSaveResponse snilsPerson = new SnilsSaveResponse(person);
         snilsPerson.setDateInsert(new Date());
-        System.out.println("ssaving:" + snilsPerson);
 
 
         em.getTransaction().begin();
@@ -70,6 +85,5 @@ public class SnilsDAO {
         }
         em.getTransaction().commit();
 
-        em.close();
     }
 }

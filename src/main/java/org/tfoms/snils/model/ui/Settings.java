@@ -1,14 +1,18 @@
 package org.tfoms.snils.model.ui;
 
 import javafx.scene.control.Alert;
-import javafx.scene.layout.BorderPane;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Properties;
 
+
+@Component
 public class Settings {
+    private static Logger LOG = LoggerFactory.getLogger(Settings.class);
+
     /**
      * Путь к файлу с настройками
      * */
@@ -35,7 +39,7 @@ public class Settings {
 
     public Settings(){
         loadSettings();
-        System.out.println(this);
+        LOG.info(this.toString());
     }
 
 

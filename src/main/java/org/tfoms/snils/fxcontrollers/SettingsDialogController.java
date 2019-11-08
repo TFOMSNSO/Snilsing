@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.Properties;
 
-
 public class SettingsDialogController {
 
     private boolean isChanged = false;
@@ -42,6 +41,12 @@ public class SettingsDialogController {
         refresh();
     }
 
+
+    /**
+     * Обновляет значения переменных экземпляра (из форм на диалоговом окне)
+     * Записывает изменения в файл
+     * Закрывает диалоговое окно
+     * */
     @FXML
     private void saveSettings(){
             settings.setErrorFolder(fieldErrorFolder.getText().trim());
@@ -56,6 +61,10 @@ public class SettingsDialogController {
             reject();
     }
 
+    /**
+     * В зависимости от флага isChanged
+     * либо просто закрывает окно, либо закрывает с предварительным подтверждением
+     * */
     @FXML
     private void reject(){
         if(isChanged){
@@ -69,12 +78,18 @@ public class SettingsDialogController {
         }
     }
 
+    /**
+     * Когда пользователь меняет какое-нибудь значение,
+     * вызывается этот метод, чтобы установить флаг
+     * */
     @FXML
     private void changesMade(){
         this.isChanged = true;
-        System.out.println("changes");
     }
 
+    /**
+     * Обновляет содержимое окна значениями из переменных экземпляра
+     * */
     private void refresh(){
         fieldRequestFolder.setText(settings.getRequestFolder());
 
@@ -88,6 +103,12 @@ public class SettingsDialogController {
     }
 
 
+    /**
+     * Вызов диалогового окна с подтверждением действия
+     * @param action Описание действия
+     * @return true - пользователь согласился
+     *         false - пользователь отказался
+     * */
     private boolean areYouSure(String action){
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, action);
         alert.setHeaderText("Вы уверены?");
@@ -97,6 +118,10 @@ public class SettingsDialogController {
         return false;
     }
 
+
+    /**
+     * Сбрасывает настройки до настроек по умолчанию
+     * */
     @FXML
     private void resetSettings(){
         if(areYouSure("Сбросить настройки до настроек по умолчанию")) {

@@ -4,6 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.3.RELEASE</version>
+    </parent>
+
+
     <groupId>org.tfoms</groupId>
     <artifactId>Snilsing</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -16,12 +23,29 @@
     </properties>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>5.3.7.Final</version>
+            <artifactId>hibernate-entitymanager</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+
+
+
         <!-- https://mvnrepository.com/artifact/com.oracle/ojdbc6 -->
         <dependency>
             <groupId>com.oracle</groupId>
@@ -79,7 +103,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>org.tfoms.snils.MainWindow</mainClass>
+                            <mainClass>org.tfoms.snils.SpringJavafx</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -93,14 +117,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--<plugin>-->
-                <!--<groupId>com.zenjava</groupId>-->
-                <!--<artifactId>javafx-maven-plugin</artifactId>-->
-                <!--<version>8.8.3</version>-->
-                <!--<configuration>-->
-                    <!--<mainClass>org.tfoms.snils.MainWindow</mainClass>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
         </plugins>
     </build>
 </project>
