@@ -16,6 +16,6 @@ Add all available elements to output.<br>
 Go to Java-FX tab, select main class (SpringJavafx) and change value of **native bundle**
 to **all**<br>
 Now you can build artifact by choosing *Build Artifacts...* -> *Artifact name* -> *build* <br>
-Here we get application with included JRE
+Here we get an application with included JRE.
 
 
