@@ -215,7 +215,7 @@ public class XmlParser {
             return new String[]{};
         }
         // out values
-        String outPlaceType = "";
+        String outPlaceType = specificPlaceType;
         String outSettlement = "";
         String outDistrict = "";
         String outRegion = "";
@@ -261,8 +261,8 @@ public class XmlParser {
 
         bornString = bornString.replaceAll("(Р\\. П\\. |Р-П|ПОС\\. Г\\. Т\\. |П\\. Г\\. Т\\. |Р\\. ПОС\\. |Д\\. П\\. |" +
                 "Г\\. П\\. |РАБ\\. ПОС\\. |Х\\. КР\\. |ПГТ\\. |А\\. |РП\\. |Г\\. |С/З|С\\. |Д\\. |ДЕР\\. |СТ\\. |ГОР\\. |" +
-                "ПОС\\. |П\\. |СТАНЦИЯ|СОВХОЗ|ПОСЕЛОК|ПОСЁЛОК|Р-Д|С-З|ДЕРЕВНЯ|С/Х|С\\\\Х|К/С|Ш-ТА|З/С|РАБОЧИЙ ГОРОД|Р\\. П|" +
-                "СТАН\\.|С\\\\С|С\\\\З|Б\\\\П|К\\. |Х\\. |С/С Ф\\. |СЕЛ\\. |С-С |УЧ\\. |ГО\\. |ПР\\. )","ГОРОД ");
+                "ПОС\\. |П\\. |СТАНЦИЯ ?|СОВХОЗ ?|ПОСЕЛОК ?|ПОСЁЛОК ?|Р-Д ?|С-З ?|ДЕРЕВНЯ ?|С/Х ?|С\\\\Х ?|К/С ?|Ш-ТА ?|З/С ?|РАБОЧИЙ ГОРОД|Р\\. П |" +
+                "СТАН\\.|С\\\\С ?|С\\\\З ?|Б\\\\П ?|К\\. |Х\\. |С/С Ф\\. |СЕЛ\\. |С-С ?|С/С ?|УЧ\\. |ГО\\. |ПР\\. )","ГОРОД ");
 
         bornString = bornString.replaceAll("НСО"," НОВОСИБИРСКАЯ ОБЛ. ");
 
@@ -438,16 +438,22 @@ public class XmlParser {
             String addr[] = bornString.split("\\s");                //17
             outPlaceType = specificPlaceType;
             outSettlement = addr[addr.length - 1];
+        }else if(Pattern.matches(String.format(".*%s\\s%s",name,towns),bornString)){
+            String addr[] = bornString.split("\\s");                //18
+            outPlaceType = specificPlaceType;
+            outSettlement = addr[addr.length - 2];
+        }else if(Pattern.matches(String.format(".*%s\\s%s\\s%s\\s%s",name,districts,name,regions),bornString)){
+            String addr[] = bornString.split("\\s");                //19
+            outPlaceType = specificPlaceType;
+            regionType = addr[addr.length - 1];
+            outRegion = addr[addr.length - 2];
+            outDistrict = addr[addr.length - 4];
+        }else if(Pattern.matches(String.format(".*%s\\s%s",name,regions),bornString)){
+            String addr[] = bornString.split("\\s");                //20
+            outPlaceType = specificPlaceType;
+            regionType = addr[addr.length - 1];
+            outRegion = addr[addr.length - 2];
         }
-
-
-
-
-
-
-
-
-
 
 
         // Меняем падеж на именительный
@@ -472,9 +478,9 @@ public class XmlParser {
             outDistrict.replaceAll("НОГО$","НЫЙ");
         }
 
-        if(outPlaceType.length() == 0){
+        if(outSettlement.length() == 0 && outRegion.length() == 0 && outDistrict.length() == 0 && outCountry.length() == 0)  {
             i++;
-            System.out.println("|" + bornString + "|");
+            System.out.println("|" + bornString + "|-->" + Arrays.toString(new String[]{outPlaceType, outSettlement, outDistrict, outRegion, outCountry}) );
         }
 
 

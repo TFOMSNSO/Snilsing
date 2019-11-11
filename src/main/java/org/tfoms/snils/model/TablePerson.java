@@ -4,6 +4,12 @@ import javafx.scene.control.Tab;
 
 import java.util.Date;
 
+
+
+
+/**
+ * Экземпляры этого класса отображаюся в Tableview
+ * */
 public class TablePerson {
     private String snils;
     private String enp;
@@ -16,7 +22,8 @@ public class TablePerson {
     private Personadd personadd;
     private String sex;
 
-
+    public TablePerson() {
+    }
 
     public TablePerson(SnilsSaveResponse s){
         this.snils = s.getSnils();

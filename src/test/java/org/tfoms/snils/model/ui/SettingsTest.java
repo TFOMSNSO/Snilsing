@@ -25,7 +25,7 @@ public class SettingsTest {
         settings = new Settings();
         assertNotNull(settings);
         boolean old = settings.isSaveResponse();
-        settings.setSaveResponse(false);
+        settings.setSaveResponse(!old);
         settings.save();
 
 

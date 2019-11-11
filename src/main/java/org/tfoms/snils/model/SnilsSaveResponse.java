@@ -12,7 +12,8 @@ import java.util.Date;
                 "                                                            and s.personFirstname = :firstname " +
                                                                             "and s.personSurname=:surname " +
                                                                             "and s.personLastname = :lastname "),
-        @NamedQuery(name = "findSnilsGood",query = "from SnilsSaveResponse s order by s.personSurname, s.personFirstname, s.personLastname ")
+        @NamedQuery(name = "findSnilsGood",query = "from SnilsSaveResponse s order by s.dateInsert, s.personSurname, s.personFirstname, s.personLastname "),
+        @NamedQuery(name = "findSnilsGoodByEnp", query = "from SnilsSaveResponse s where s.enp = :enp")
 })
 public class SnilsSaveResponse {
     @Id
@@ -165,5 +166,25 @@ public class SnilsSaveResponse {
     }
 
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null) return false;
 
+        if(!(obj instanceof SnilsSaveResponse)) return false;
+
+        SnilsSaveResponse other = (SnilsSaveResponse) obj;
+
+        if(!enp.equals(other.enp)) return false;
+        if(!snils.equals(other.snils)) return false;
+        if(!sex.equals(other.sex)) return false;
+        if(!personSurname.equals(other.personSurname)) return false;
+        if(!personFirstname.equals(other.personFirstname)) return false;
+        if(!personLastname.equals(other.personLastname)) return false;
+        if(!personBirthday.equals(other.personBirthday)) return false;
+        if(!personNumdoc.equals(other.personNumdoc)) return false;
+        if(!personSerdoc.equals(other.personSerdoc)) return false;
+        if(!dateInsert.equals(other.dateInsert)) return false;
+
+        return true;
+    }
 }

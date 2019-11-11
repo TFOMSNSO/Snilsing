@@ -40,17 +40,15 @@ public class XmlParserTest {
         parser = new XmlParser(new Settings());
     }
 
+    @Ignore
     @Test
     public void parseBirthPlace() {
         for(Person p : people){
             Personadd pa = p.getPersonadd();
             String[] el = parser.tryParse(pa);
-            try {
-                if(el.length == 5)
+
+            if(el.length == 5)
                 assertTrue("|" + pa.getBorn() + "-> " + Arrays.toString(el), el[0].equals("ОСОБОЕ") || el[0].equals("СТАНДАРТНОЕ"));
-            } catch (AssertionError e){
-                System.out.println(e);
-            }
         }
         System.out.println(parser.j);
         System.out.println(parser.i);

@@ -17,9 +17,7 @@ import java.util.List;
 public class SnilsDAO {
     static final Logger LOG = LoggerFactory.getLogger(SnilsDAO.class);
 
-    static int count = 0;
-
-    static EntityManager em = Persistence.createEntityManagerFactory("developerUnit").createEntityManager();
+    private static EntityManager em = Persistence.createEntityManagerFactory("developerUnit").createEntityManager();
 
     /**
      * Возвращает все записи из таблицы SNILS_SAVE_RESPONSE_NEW (developer@dame)
@@ -56,34 +54,37 @@ public class SnilsDAO {
         return tablePerson;
     }
 
-
-
     /**
      * Вставка человека с полисом в SNILS_SAVE_RESPONSE_NEW (developer@dame)
      * */
     public static void insertPerson(TablePerson person){
-        if(person.getSnils().trim().toLowerCase().contains("нет данных") || person.getSnils().trim().equals("-") || person.getSnils().trim().equals("ошибка")) return;
+        if(person == null) return;
+
+        String personSnils = person.getSnils();
+
+        if(personSnils == null || personSnils.length() != 11 ||
+                personSnils.toLowerCase().contains("ошибка")) return;
+
 
         SnilsSaveResponse snilsPerson = new SnilsSaveResponse(person);
         snilsPerson.setDateInsert(new Date());
 
 
         em.getTransaction().begin();
-        List<SnilsSaveResponse> list = em.createNamedQuery("findSnilsById",SnilsSaveResponse.class)
-                .setParameter("birthday",person.getPersonBirthday())
-                .setParameter("firstname",person.getPersonFirstname())
-                .setParameter("surname",person.getPersonSurname())
-                .setParameter("lastname",person.getPersonLastname()).getResultList();
+        SnilsSaveResponse snilsSaveResponse = em.find(SnilsSaveResponse.class, person.getEnp());
 
-        if(list.isEmpty()){
+
+
+        if(snilsSaveResponse == null){
             em.persist(snilsPerson);
         }else{
-            if(list.size() == 1){
-                em.remove(list.get(0));
-                em.persist(snilsPerson);
-            }
+            em.remove(snilsSaveResponse);
+            em.persist(snilsPerson);
         }
         em.getTransaction().commit();
+    }
 
+    public static SnilsSaveResponse findPerson(String enp){
+        return em.find(SnilsSaveResponse.class,enp);
     }
 }
