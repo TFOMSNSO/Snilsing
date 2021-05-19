@@ -22,6 +22,13 @@ public class Personadd {
 
     private Integer russian;
 
+    public Personadd()
+    {}
+
+    public Personadd(String born) {
+        this.born = born;
+    }
+
     @Override
     public String toString() {
         return "Personadd{" +

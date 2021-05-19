@@ -24,11 +24,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.tfoms.snils.dao.PersonDAO;
 import org.tfoms.snils.dao.SnilsSaveDAO;
+import org.tfoms.snils.model.Personadd;
 import org.tfoms.snils.model.TablePerson;
 import org.tfoms.snils.model.ui.StatusBar;
 
 import java.io.*;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -292,14 +295,45 @@ public class IndexController implements Initializable {
                 }else {
                     for (int i = 0; i < rows; i++) {
                         Row row = sheet.getRow(i);
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
                         try {
-                            enps.add(row.getCell(0).getStringCellValue().trim());
+                            if (row.getPhysicalNumberOfCells() > 1) {
+                                TablePerson tp = new TablePerson();
+                                tp.setEnp(Optional.ofNullable(row.getCell(0).getStringCellValue()).map(String::trim).map(String::toUpperCase).orElse(null));
+                                tp.setPersonSurname(Optional.ofNullable(row.getCell(1).getStringCellValue()).map(String::trim).map(String::toUpperCase).orElse(null));
+                                tp.setPersonFirstname(Optional.ofNullable(row.getCell(2).getStringCellValue()).map(String::trim).map(String::toUpperCase).orElse(null));
+                                tp.setPersonLastname(Optional.ofNullable(row.getCell(3).getStringCellValue()).map(String::trim).map(String::toUpperCase).orElse(null));
+                                tp.setPersonBirthday(Optional.ofNullable(row.getCell(4).getDateCellValue()).map(sdf::format)
+                                        .map(s -> {
+                                            try {
+                                                return sdf.parse(s);
+                                            } catch (ParseException e) {
+                                                return null;
+                                            }
+                                        }).orElse(null));
+                                Cell serCell = row.getCell(5);
+                                serCell.setCellType(CellType.STRING);
+                                String ser = Optional.ofNullable(serCell.getStringCellValue()).map(String::trim).orElse(null);
+                                Cell numCell = row.getCell(6);
+                                numCell.setCellType(CellType.STRING);
+                                String num  = Optional.ofNullable(numCell.getStringCellValue()).map(String::trim).orElse(null);
+                                tp.setPersonSerdoc(ser);
+                                tp.setPersonNumdoc(num);
+                                tp.setPersonadd(new Personadd(Optional.ofNullable(row.getCell(7))
+                                        .map(Cell::getStringCellValue).map(String::trim)
+                                        .map(String::toUpperCase).orElse(null)));
+                                data.add(tp);
+                            }
+                            else
+                            {
+                                enps.add(row.getCell(0).getStringCellValue().trim());
+                            }
                         } catch (Exception ex) {
                             break;
                         }
                     }
 
-                    data = personDAO.findAllByEnp(enps);
+                    data.addAll(personDAO.findAllByEnp(enps));
                 }
 
 
